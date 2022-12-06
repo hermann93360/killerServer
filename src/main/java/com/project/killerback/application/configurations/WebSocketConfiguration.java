@@ -1,5 +1,6 @@
 package com.project.killerback.application.configurations;
 
+import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.CloseStatus;
@@ -22,6 +23,7 @@ public class WebSocketConfiguration extends TextWebSocketHandler implements WebS
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/socket")
+                .setAllowedOrigins("http://localhost:4200/", "http://44.212.55.66:80/")
                 .withSockJS();
     }
 
