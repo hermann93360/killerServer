@@ -23,7 +23,7 @@ public class WebSocketConfiguration extends TextWebSocketHandler implements WebS
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/socket")
-                .setAllowedOrigins("http://localhost:4200/", "http://44.212.55.66:80/")
+                .setAllowedOrigins("http://44.212.55.66/", "http://localhost:4200/")
                 .withSockJS();
     }
 
