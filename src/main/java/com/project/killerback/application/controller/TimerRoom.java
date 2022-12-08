@@ -54,7 +54,6 @@ public class TimerRoom {
                     mainController.send("/socket/day/" + room.getIdRoom(), toUserDto(user));
                 }
             }
-            timer.cancel();
         }
     }
 }
