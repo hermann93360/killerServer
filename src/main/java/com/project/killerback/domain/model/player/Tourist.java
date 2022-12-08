@@ -10,5 +10,6 @@ public class Tourist extends Player{
     @Override
     public void vote(Player player) {
         player.takeVote(0);
+        setAlreadyVote(true);
     }
 }

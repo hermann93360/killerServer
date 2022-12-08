@@ -33,12 +33,10 @@ public class TimerRoom {
                 timer.cancel();
                 if(day){
                     day = false;
-                    //Notification.sendInRoom("/play/night", null,room.getIdRoom());
 
                     new TimerRoom(10, room, day);
                 }else{
                     day = true;
-                    //Notification.sendInRoom("/play/day", null, room.getIdRoom());
 
                     room.killUser();
                     new TimerRoom(20, room, day);

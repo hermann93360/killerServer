@@ -13,6 +13,7 @@ public class Killer extends Player{
     @Override
     public void vote(Player player) {
         player.takeVote(1);
+        setAlreadyVote(true);
     }
 
     public void kill(Player player) throws Exception {

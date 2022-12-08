@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.util.*;
 
+import static com.project.killerback.domain.model.State.DAY;
+import static com.project.killerback.domain.model.State.NOT_STARTED;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,8 +19,7 @@ public class Room {
     private String nameRoom;
     private List<User> users;
     private Stack<Chat> chats;
-    private int stateRoom;
-    private int count;
+    private State state;
 
     private List<Player> associatePlayer;
 
@@ -41,14 +43,15 @@ public class Room {
     }
 
     private Room(String nameRoom){
+        idIncrement++;
         Collections.shuffle(iconPlayers);
         iconPlayersToAttribut = new ArrayList<>(iconPlayers);
-        idIncrement++;
 
         this.idRoom = idIncrement;
         this.nameRoom = nameRoom;
         this.users = new ArrayList<>();
         this.chats = new Stack<>();
+        this.state = NOT_STARTED;
 
         this.associatePlayer = new ArrayList<>();
         associatePlayer.add(new Boss());
@@ -70,7 +73,7 @@ public class Room {
         return this.users.size();
     }
 
-    private boolean canAddUser(){
+    public boolean canAddUser(){
         return this.sizeOfUsers() < MAX_PLAYER;
     }
 
@@ -81,10 +84,6 @@ public class Room {
         this.users.add(user);
         user.setRoom(this);
         setRandomImgPlayer(user);
-
-        if(sizeOfUsers() == MAX_PLAYER){
-            this.start();
-        }
     }
 
     private void setRandomImgPlayer(User user){
@@ -97,13 +96,12 @@ public class Room {
     }
 
     public void start(){
+        state = DAY;
         setAllPlayer();
-        runTimer();
     }
 
-
-    public void runTimer(){
-        new TimerRoom(20, this, true);
+    public boolean isDay() {
+        return this.state.equals(DAY);
     }
 
     public boolean someoneWin(){
@@ -111,15 +109,17 @@ public class Room {
                 .stream()
                 .filter(x -> !x.getPlayer().isDead())
                 .count() == 1;
+
     }
 
     public void setAllPlayer(){
-        this.users.forEach(user -> user.setPlayer(attributPlayerToUser()));
+        for (User u : this.users) {
+            u.setPlayer(attributPlayerToUser());
+        }
     }
 
     private Player attributPlayerToUser() {
-        Random random = new Random();
-        int randomValue = random.nextInt(this.associatePlayer.size());
+        int randomValue = randomValue(this.associatePlayer.size());
 
         Player player = this.associatePlayer.get(randomValue);
         this.associatePlayer.remove(randomValue);
@@ -127,12 +127,17 @@ public class Room {
         return player;
     }
 
-    public void killUser() {
+    private int randomValue(int max) {
+        return (int)(Math.random() * (max));
+    }
+
+    public User killUser() {
         this.users.sort((o1, o2) -> (o1.getPlayer().getVote() <= o2.getPlayer().getVote()) ? 0 : -1);
         User user = this.users.get(0);
         user.getPlayer().kill();
         this.users.forEach(x -> x.getPlayer().resetVote());
 
+        return user;
     }
 
     public List<Chat> getAllChats() {
@@ -145,7 +150,6 @@ public class Room {
 
     public void destroy(){
         ROOMS.remove(this);
-        //Notification.sendAll("/room/notification", null);
     }
 
     // Methods statics

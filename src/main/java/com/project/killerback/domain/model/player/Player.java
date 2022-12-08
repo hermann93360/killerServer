@@ -9,10 +9,12 @@ public abstract class Player {
     private boolean alive;
     private int vote;
     private static final int MAX_PLAYER_TYPE = 4;
+    private boolean alreadyVote;
 
 
     public Player() {
         this.alive = true;
+        this.alreadyVote = false;
         vote = 0;
     }
 
@@ -20,6 +22,9 @@ public abstract class Player {
         this.vote += vote;
     }
 
+    public void setAlreadyVote(boolean vote) {
+        this.alreadyVote = vote;
+    }
     public abstract void vote(Player player);
 
     public boolean isDead(){
@@ -32,5 +37,6 @@ public abstract class Player {
 
     public void resetVote() {
         this.vote = 0;
+        setAlreadyVote(false);
     }
 }

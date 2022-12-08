@@ -10,5 +10,6 @@ public class Boss extends Player{
     @Override
     public void vote(Player player) {
         player.takeVote(2);
+        setAlreadyVote(true);
     }
 }

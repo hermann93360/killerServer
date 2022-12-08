@@ -40,11 +40,6 @@ public class User {
         this.discussions = new ArrayList<>();
 
         USERS.add(this);
-       // initData();
-
-        //Transfer transfer = new Transfer("/set/id", new UserDto(id), RESPONSE);
-        //this.send(transfer);
-
     }
 
     public void joinRoom(Room room){

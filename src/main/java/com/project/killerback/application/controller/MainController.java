@@ -1,10 +1,12 @@
 package com.project.killerback.application.controller;
 
 import com.project.killerback.application.dto.*;
+import com.project.killerback.domain.exception.RoomException;
 import com.project.killerback.domain.model.Chat;
 import com.project.killerback.domain.model.Discussion;
 import com.project.killerback.domain.model.Room;
 import com.project.killerback.domain.model.User;
+import com.project.killerback.domain.model.player.Player;
 import com.project.killerback.domain.services.MapperService;
 import com.project.killerback.domain.services.RoomService;
 import com.project.killerback.domain.services.UserService;
@@ -62,6 +64,16 @@ public class MainController {
         );
 
         this.simpMessagingTemplate.convertAndSend("/socket/someoneJoinAnyRoom", new UpdateNumberRoomDto(joinRoomDto.getIdRoom(), user.getRoom().getUsers().size()));
+
+        //to refacto later
+
+        Room room =  Room.getRoom(joinRoomDto.getIdRoom());
+
+        if(!room.canAddUser()) {
+            room.start();
+            new TimerRoom(20, room, this);
+            this.simpMessagingTemplate.convertAndSend("/socket/startInRoom/" + room.getIdRoom(), toRoomDto(room));
+        }
     }
 
     @MessageMapping("/socket/disconnect")
@@ -88,6 +100,23 @@ public class MainController {
         this.simpMessagingTemplate.convertAndSend("/socket/privateChatNotif/" + chatDto.getIdDestination(), toChatDtoForPrivateChat(lastChat));
     }
 
+    //toRefacto
+
+    @MessageMapping("/socket/vote")
+    public void sendPublicChat(VoteDto voteDto) throws Exception {
+        Player playerMain = User.getUser(voteDto.getIdMainUser()).getPlayer();
+        Player playerTarget = User.getUser(voteDto.getIdTargetUser()).getPlayer();
+
+        if(playerMain.isAlreadyVote()){
+            throw new RoomException("This player has already vote for a another player");
+        }
+
+        playerMain.vote(playerTarget);
+        VoteDto voteDtoResponse = new VoteDto(voteDto.getIdMainUser(), voteDto.getIdTargetUser(), voteDto.getIdRoom(), playerTarget.getVote());
+
+        this.simpMessagingTemplate.convertAndSend("/socket/votePublic/" + voteDto.getIdRoom(), voteDtoResponse);
+    }
+
     @GetMapping("/get/users")
     public ResponseEntity<List<UserDto>> getUsers() {
        List<User> users = this.userService.getAllUsers();
@@ -110,5 +139,9 @@ public class MainController {
     public ResponseEntity<List<ChatDto>> getChatsInRoom(@PathVariable long idRoom) throws Exception {
         Stack<Chat> chats = this.userService.getChatsInRoom(idRoom);
         return ResponseEntity.ok(toListChatDtoForPublicChat(chats));
+    }
+
+    public void send(String path, Object o){
+        this.simpMessagingTemplate.convertAndSend(path, o);
     }
 }
