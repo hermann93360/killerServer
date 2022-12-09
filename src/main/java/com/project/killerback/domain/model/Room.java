@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.project.killerback.domain.model.State.DAY;
 import static com.project.killerback.domain.model.State.NOT_STARTED;
@@ -132,7 +133,11 @@ public class Room {
     }
 
     public User killUser() {
-        this.users.sort((o1, o2) -> (o1.getPlayer().getVote() <= o2.getPlayer().getVote()) ? 0 : -1);
+        this.users.stream()
+                .filter((p) -> p.getPlayer().isAlive())
+                .collect(Collectors.toList())
+                .sort((o1, o2) -> (o1.getPlayer().getVote() <= o2.getPlayer().getVote()) ? 0 : -1);
+
         User user = this.users.get(0);
         user.getPlayer().kill();
         this.users.forEach(x -> x.getPlayer().resetVote());
