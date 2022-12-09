@@ -133,14 +133,16 @@ public class Room {
     }
 
     public User killUser() {
-        this.users.stream()
-                .filter((p) -> p.getPlayer().isAlive())
-                .collect(Collectors.toList())
-                .sort((o1, o2) -> (o1.getPlayer().getVote() <= o2.getPlayer().getVote()) ? 0 : -1);
+        List<User> userInLife = this.users.stream()
+                .filter((p) -> !p.getPlayer().isDead())
+                .sorted((o1, o2) -> (o1.getPlayer().getVote() <= o2.getPlayer().getVote()) ? 0 : -1)
+                .collect(Collectors.toList());
 
-        User user = this.users.get(0);
+
+
+        User user = userInLife.get(0);
         user.getPlayer().kill();
-        this.users.forEach(x -> x.getPlayer().resetVote());
+        userInLife.forEach(x -> x.getPlayer().resetVote());
 
         return user;
     }

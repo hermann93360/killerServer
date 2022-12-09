@@ -2,8 +2,10 @@ package com.project.killerback.domain.model.player;
 
 
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public abstract class Player {
 
     private boolean alive;
