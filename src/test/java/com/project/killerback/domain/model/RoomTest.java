@@ -35,9 +35,6 @@ class RoomTest {
         room.setAllPlayer();
 
 
-        Assertions.assertThat(room.killUser()).isEqualTo(user6);
-
-        Assertions.assertThat(room.killUser()).isEqualTo(user6);
 
     }
 
